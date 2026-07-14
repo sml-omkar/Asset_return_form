@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Asset Return Form</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+        .header p { opacity: 0.9; font-size: 0.95rem; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        label .optional {
+            color: var(--text-light);
+            font-weight: 400;
+            font-size: 0.8rem;
+        }
+
+        input[type="text"],
+        select {
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input::placeholder { color: #cbd5e1; }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { background: #16a34a; transform: translateY(-1px); }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover { background: #d97706; transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: popIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal h2 { margin-bottom: 10px; color: var(--text); }
+        .modal p { color: var(--text-light); margin-bottom: 20px; }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--text);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: #ef4444; }
+        .toast.warning { background: var(--warning); }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.5rem; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Asset Return Form</h1>
+        <p>Fill in the details below. All fields are completely optional — leave blank to skip.</p>
+    </div>
+
+    <div class="container">
+        <form id="assetForm" method="post" enctype="multipart/form-data">
+            {% for section_name, fields in sections.items() %}
+            <div class="section">
+                <div class="section-title">
+                    <span>{{ section_name }}</span>
+                </div>
+                <div class="form-row">
+                    {# Expecting fields to be a list of tuples: (key, label, ftype) #}
+                    {% for key, label, ftype in fields %}
+                    <div class="form-group {% if fields|length == 1 %}full-width{% endif %}">
+                        <label for="{{ key }}">{{ label }} <span class="optional">(optional)</span></label>
+                        {% if ftype == "select" %}
+                        <select id="{{ key }}" name="{{ key }}">
+                            <option value="" selected>-- Select --</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        {% else %}
+                        <input type="text" id="{{ key }}" name="{{ key }}" placeholder="Enter {{ label }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+
+        <div class="actions">
+            <button type="button" class="btn btn-primary" onclick="generateForm('preview')">
+                <span>👁</span> Preview
+            </button>
+            <button type="button" class="btn btn-success" onclick="generateForm('save')">
+                <span>💾</span> Save Form
+            </button>
+            <button type="button" class="btn btn-warning" onclick="generateForm('print')">
+                <span>🖨</span> Print
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                <span>🗑</span> Clear All
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal-overlay" id="loadingModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loadingTitle">
+            <div class="spinner" aria-hidden="true"></div>
+            <h2 id="loadingTitle">Generating Form...</h2>
+            <p>Please wait while we prepare your document.</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+            <h2 id="successTitle">✅ Success!</h2>
+            <p id="successMsg">Your form has been generated.</p>
+            <div class="actions" style="margin-top: 20px;">
+                <button class="btn btn-primary" id="previewBtn" style="display:none;" onclick="previewFile()">Open Preview</button>
+                <button class="btn btn-success" id="downloadBtn" style="display:none;" onclick="downloadFile()">Download</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+let currentFile = null;
+let currentFilename = null;
+
+function showLoading() {
+  document.getElementById('loadingModal').classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loadingModal').classList.remove('active');
+}
+
+function showModal(title, msg, showPreview = false, showDownload = false) {
+  document.getElementById('successTitle').textContent = title;
+  document.getElementById('successMsg').textContent = msg;
+  document.getElementById('previewBtn').style.display = showPreview ? 'flex' : 'none';
+  document.getElementById('downloadBtn').style.display = showDownload ? 'flex' : 'none';
+  document.getElementById('successModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('active');
+}
+
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show ' + type;
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.className = 'toast ' + type;
+  }, 3000);
+}
+
+/**
+ * Fetch a PDF (or other printable file) and open a print window that triggers the browser print dialog.
+ * url: URL to the file (e.g., '/preview/filename.pdf' or '/download/filename.pdf')
+ * autoClose: close the print window after printing (best-effort)
+ */
+async function openPdfAndPrint(url, autoClose = true) {
+  try {
+    const resp = await fetch(url, { credentials: 'same-origin' });
+    if (!resp.ok) throw new Error('Failed to fetch file: ' + resp.statusText);
+    const blob = await resp.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    const printHtml = `
+      <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Print Document</title>
+        <style>html,body{height:100%;margin:0}iframe{border:none;width:100%;height:100vh}</style>
+      </head>
+      <body>
+        <iframe id="pdfFrame" src="${blobUrl}"></iframe>
+        <script>
+          const frame = document.getElementById('pdfFrame');
+          function triggerPrint() {
+            try {
+              window.focus();
+              setTimeout(() => {
+                window.print();
+                ${autoClose ? "setTimeout(() => window.close(), 500);" : ""}
+              }, 300);
+            } catch (e) {
+              console.error('Print error:', e);
+            }
+          }
+          frame.onload = triggerPrint;
+          setTimeout(triggerPrint, 3000);
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      window.open(blobUrl, '_blank');
+      showToast('Popup blocked. Opened file in new tab; please print manually.', 'warning');
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+  } catch (err) {
+    console.error(err);
+    showToast('Unable to open print window: ' + (err.message || err), 'error');
+  }
+}
+
+function generateForm(action) {
+  showLoading();
+  const form = document.getElementById('assetForm');
+  const formData = new FormData(form);
+
+  fetch('/generate', {
+    method: 'POST',
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    hideLoading();
+    if (data && data.success) {
+      // Prefer preview_url, fallback to download_url
+      currentFile = data.preview_url || data.download_url || null;
+      currentFilename = data.pdf_filename || data.docx_filename || null;
+
+      if (action === 'preview') {
+        if (currentFile) {
+          showModal('👁 Preview Ready', 'Your form is ready for preview.', true, true);
+        } else {
+          showToast('No preview available', 'error');
+        }
+      } else if (action === 'save') {
+        showModal('💾 Saved!', 'Form saved as: ' + (currentFilename || 'untitled'), !!currentFile, !!currentFile);
+        showToast('Form saved successfully!');
+      } else if (action === 'print') {
+        if (!currentFile) {
+          showToast('No file available to print', 'error');
+          return;
+        }
+        // Use browser print dialog so user's network printers are available
+        openPdfAndPrint(currentFile, true);
+      }
+    } else {
+      showToast((data && data.message) || 'Failed to generate form', 'error');
+    }
+  })
+  .catch(err => {
+    hideLoading();
+    showToast('Error: ' + (err.message || 'Unknown error'), 'error');
+  });
+}
+
+function previewFile() {
+  if (currentFile) {
+    window.open(currentFile, '_blank');
+  } else {
+    showToast('No preview available', 'error');
+  }
+}
+
+function downloadFile() {
+  // Prefer download route if backend provided separate download_url
+  const downloadUrl = currentFile ? currentFile.replace('/preview/', '/download/') : null;
+  if (downloadUrl) {
+    window.open(downloadUrl, '_blank');
+  } else if (currentFile) {
+    window.open(currentFile, '_blank');
+  } else {
+    showToast('No file available to download', 'error');
+  }
+}
+
+function clearForm() {
+  if (confirm('Clear all fields?')) {
+    document.getElementById('assetForm').reset();
+    showToast('All fields cleared');
+  }
+}
+
+// Accessibility: close modals with Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    hideLoading();
+    closeModal();
+  }
+});
+</script>
+<!-- Injected employee lookup button and logic -->
+<script>
+(function() {
+  // Fallback helpers only if your page doesn't already define them
+  if (typeof showLoading !== 'function') {
+    window.showLoading = function(msg = 'Loading...') {
+      let el = document.getElementById('__loading_overlay_injected');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = '__loading_overlay_injected';
+        el.style = 'position:fixed;right:16px;bottom:16px;padding:8px 12px;background:#222;color:#fff;border-radius:6px;z-index:9999;font-family:system-ui;';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.display = 'block';
+    };
+  }
+  if (typeof hideLoading !== 'function') {
+    window.hideLoading = function() {
+      const el = document.getElementById('__loading_overlay_injected');
+      if (el) el.style.display = 'none';
+    };
+  }
+  if (typeof showToast !== 'function') {
+    window.showToast = function(msg, type = 'info') {
+      const colors = { info: '#2b6cb0', success: '#2f855a', warning: '#d69e2e', error: '#c53030' };
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style = `position:fixed;left:16px;bottom:16px;padding:10px 14px;color:#fff;border-radius:6px;background:${colors[type]||colors.info};z-index:10000;font-family:system-ui;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    };
+  }
+
+  // Find the existing employee_id input by id or name
+  const empInput = document.getElementById('employee_id') || document.querySelector('[name="employee_id"]');
+  if (!empInput) {
+    console.warn('employee_id input not found; lookup button not injected.');
+    return;
+  }
+
+  // Prevent double injection
+  if (document.getElementById('empSearchBtn_injected')) return;
+
+  // Create the small search button
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'empSearchBtn_injected';
+  btn.setAttribute('aria-label', 'Search employee');
+  btn.title = 'Search employee';
+  btn.innerHTML = '🔍';
+  // Styling to match your UI
+  btn.style.marginLeft = '8px';
+  btn.style.padding = '8px 10px';
+  btn.style.fontSize = '0.95rem';
+  btn.style.cursor = 'pointer';
+  btn.style.border = '1px solid var(--border)';
+  btn.style.background = 'white';
+  btn.style.borderRadius = '8px';
+  btn.style.color = 'var(--text)';
+  btn.className = 'btn btn-secondary'; // uses your existing CSS classes
+
+  // Insert button after the input
+  const parent = empInput.parentNode;
+  if (parent) {
+    // If input is block-level and full width, wrap into a flex container
+    const computed = window.getComputedStyle(empInput);
+    if (computed.display === 'block' || computed.width === '100%') {
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.gap = '8px';
+      wrapper.style.alignItems = 'center';
+      parent.replaceChild(wrapper, empInput);
+      wrapper.appendChild(empInput);
+      wrapper.appendChild(btn);
+      empInput.style.flex = '1';
+    } else {
+      // Normal inline insertion
+      if (empInput.nextSibling) parent.insertBefore(btn, empInput.nextSibling);
+      else parent.appendChild(btn);
+    }
+  } else {
+    document.body.appendChild(btn);
+  }
+
+  // Populate form fields by name
+  function populateForm(data) {
+    if (!data || typeof data !== 'object') return;
+    Object.keys(data).forEach(key => {
+      const value = data[key] == null ? '' : String(data[key]);
+      const el = document.querySelector(`[name="${key}"]`);
+      if (!el) return;
+      const tag = el.tagName.toUpperCase();
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        el.value = value;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        el.textContent = value;
+      }
+    });
+  }
+
+  // Call backend lookup
+  async function lookupEmployee(empId) {
+    try {
+      showLoading('Looking up employee...');
+      const resp = await fetch('/lookup?employee_id=' + encodeURIComponent(empId), { credentials: 'same-origin' });
+      hideLoading();
+      if (!resp.ok) {
+        let body = null;
+        try { body = await resp.json(); } catch (e) { /* ignore */ }
+        showToast((body && body.message) || 'Employee not found', 'error');
+        return;
+      }
+      const json = await resp.json();
+      if (!json || !json.success) {
+        showToast((json && json.message) || 'Employee not found', 'error');
+        return;
+      }
+      populateForm(json.data || {});
+      showToast('Form populated from employee record', 'success');
+    } catch (err) {
+      hideLoading();
+      console.error('Lookup error', err);
+      showToast('Lookup failed: ' + (err && err.message ? err.message : 'Network error'), 'error');
+    }
+  }
+
+  // Button click handler
+  btn.addEventListener('click', function() {
+    const empId = (empInput.value || '').trim();
+    if (!empId) {
+      showToast('Enter Employee ID to search', 'warning');
+      empInput.focus();
+      return;
+    }
+    lookupEmployee(empId);
+  });
+
+  // Enter key triggers search
+  empInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      btn.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>
