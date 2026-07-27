@@ -194,13 +194,13 @@ def fill_template(data, output_path):
     doc = Document(output_path)
 
     label_to_key = {
-        "Employee Name": "employee_name",
+        "User Name": "employee_name",
         "Employee ID": "employee_id",
         "Department": "department",
         "Designation": "designation",
-        "Email ID": "email_id",
-        "Contact Number": "contact_number",
-        "Reporting Manager": "reporting_manager",
+        "Official Email ID": "email_id",
+        "Number": "contact_number",
+        "Manager Name": "reporting_manager",
         "Last Working Day": "last_working_day",
 
         "Asset Name": "asset_name",
