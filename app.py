@@ -148,6 +148,7 @@ def load_employee_data(force_reload: bool = False):
             "Date (IT)": "it_date"
         }
 
+        
         if excel_to_form:
             df = df.rename(columns=excel_to_form)
 
